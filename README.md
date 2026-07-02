@@ -198,11 +198,16 @@ Also needs a UTF8 locale and a font that covers:
 
 ## Installation
 
-1. Make sure you have the latest MSVC Runtime Libraries installed: https://aka.ms/vs/17/release/vc_redist.x64.exe
+1. Make sure you have the latest Microsoft Visual C++ Redistributable installed for your Windows architecture:
 
-2. Download package of choice from latest [release](https://github.com/aristocratos/btop4win/releases/latest)
+    * ARM64 Windows on ARM: https://aka.ms/vs/17/release/vc_redist.arm64.exe
+    * x64 Windows: https://aka.ms/vs/17/release/vc_redist.x64.exe
+
+2. Download package of choice from latest [release](https://github.com/aristocratos/btop4win/releases/latest).
 
 3. Extract the btop4win folder anywhere and run btop4win.exe.
+
+On Windows on ARM, x64 binaries can run through emulation, but ARM64 binaries run natively.
 
 ### Package managers
 
@@ -219,27 +224,33 @@ Also needs a UTF8 locale and a font that covers:
 
 ## Compilation
 
-1. (Optional) For compiling with LibreHardwareMonitor support:
+1. Clone the repository or download source package from latest release.
 
-    * Either download latest release from https://github.com/aristocratos/LHM-CppExport and place the "external" folder in btop4win top folder, or:
+2. Open the solution with Visual Studio 2022.
 
-    * 1. Clone https://github.com/aristocratos/LHM-CppExport and open the solution
+3. In the Visual Studio toolbar, select the solution configuration and platform you want to build. If `ARM64` is not listed in the platform dropdown, open **Configuration Manager...**, choose **<New...>** under **Active solution platform**, create `ARM64` by copying settings from `x64`, and apply it to the btop4win projects.
 
-    * 2. Build Release x64 configuration for CPPdll
+### Regular build
 
-    * 3. Copy all .dll and .lib files from "x64/Release" to "external" folder in top-level of btop4win
+1. Select the `Release` solution configuration and the `ARM64` solution platform (`Release|ARM64`).
 
-2. btop4win
+2. Build the solution.
 
-    * 1. Clone the repository or download source package from latest release.
+### LHM build
 
-    * 2. Open solution with Visual Studio 2022.
+The LHM build enables LibreHardwareMonitor support and requires ARM64 LHM-CppExport binaries. `Release-LHM` also sets the admin requirement on the binary and enables the `LHM_Enabled` declaration.
 
-    * 3. Choose between Debug, Release and Release-LHM configurations.
+1. Provide ARM64 LHM-CppExport outputs using one of these methods:
 
-    * * (Release-LHM sets admin requirement on the binary, LHM_Enabled declaration and needs LHM-CppExport dll's and .lib in "external" folder).
+    * Download an ARM64 LHM-CppExport release from https://github.com/aristocratos/LHM-CppExport and place the provided `external` folder in the top-level btop4win folder, or:
 
-    * 4. Build solution.
+    * Clone https://github.com/aristocratos/LHM-CppExport, open its solution in Visual Studio 2022, select `Release|ARM64`, and build `CPPdll`.
+
+2. Copy the ARM64 `.dll` and `.lib` files to the architecture-specific btop4win external folder used by the project. For example, copy from the LHM-CppExport `ARM64/Release` output folder to `external/ARM64` when building the ARM64 configuration.
+
+3. Select the `Release-LHM` solution configuration and the `ARM64` solution platform (`Release-LHM|ARM64`).
+
+4. Build the solution.
 
 ## Configurability
 
