@@ -1834,6 +1834,34 @@ namespace Proc {
 
 	detail_container detailed;
 
+	HANDLE open_process_for_collect(const DWORD pid) {
+		auto log_access_denied = [pid](const string& attempt, const DWORD error) {
+			if (error == ERROR_ACCESS_DENIED) {
+				Logger::debug("Proc::collect() -> OpenProcess(" + attempt + ") access denied for pid " + to_string(pid)
+					+ "; expected for protected/system processes, using WMI fallback when available.");
+			}
+		};
+
+#ifdef PROCESS_QUERY_LIMITED_INFORMATION
+		HANDLE pHandle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_VM_READ, FALSE, pid);
+		if (pHandle != nullptr and pHandle != INVALID_HANDLE_VALUE) return pHandle;
+		const DWORD limited_vmread_error = GetLastError();
+		log_access_denied("PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_VM_READ", limited_vmread_error);
+
+		pHandle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
+		if (pHandle != nullptr and pHandle != INVALID_HANDLE_VALUE) return pHandle;
+		const DWORD limited_error = GetLastError();
+		log_access_denied("PROCESS_QUERY_LIMITED_INFORMATION", limited_error);
+#else
+		HANDLE pHandle = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
+		if (pHandle != nullptr and pHandle != INVALID_HANDLE_VALUE) return pHandle;
+		const DWORD query_error = GetLastError();
+		log_access_denied("PROCESS_QUERY_INFORMATION", query_error);
+#endif
+
+		return nullptr;
+	}
+
 	struct tree_proc {
 		std::reference_wrapper<proc_info> entry;
 		vector<tree_proc> children;
@@ -2156,7 +2184,8 @@ namespace Proc {
 
 				const size_t pid = pe.th32ProcessID;
 				if (pid == 0) continue;
-				HandleWrapper pHandle(OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pe.th32ProcessID));
+				HandleWrapper pHandle(open_process_for_collect(pe.th32ProcessID));
+				pHandle.valid = (pHandle() != nullptr and pHandle() != INVALID_HANDLE_VALUE);
 				const bool hasWMI = WMIList.contains(pid);
 				bool wmi_request = (not hasWMI and not Proc::WMI_running);
 				
