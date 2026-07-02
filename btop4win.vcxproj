@@ -530,7 +530,7 @@
       </AdditionalManifestFiles>
     </Manifest>
     <PreBuildEvent>
-      <Command>if not exist "$(ProjectDir)external\$(Platform)" (echo LHM-CppExport does not provide an ARM64 release in the upstream solution. Build Release ARM64 in LHM-CppExport when available and place DLL/LIB files under external\ARM64. &amp;&amp; exit /b 1)</Command>
+      <Command>if not exist "$(ProjectDir)external\$(Platform)" (echo ARM64 LHM-CppExport binaries are required under external\ARM64. Build ARM64 in LHM-CppExport when available and place CPPdll.lib and DLL files under external\ARM64. &amp; exit /b 1)&#x0D;&#x0A;if not exist "$(ProjectDir)external\$(Platform)\CPPdll.lib" (echo Missing CPPdll.lib. ARM64 LHM-CppExport binaries are required under external\ARM64. &amp; exit /b 1)&#x0D;&#x0A;dir /b "$(ProjectDir)external\$(Platform)\*.dll" &gt;nul 2&gt;nul || (echo Missing LibreHardwareMonitor DLL files. ARM64 LHM-CppExport binaries are required under external\ARM64. &amp; exit /b 1)</Command>
       <Message>Verify LibreHardwareMonitor ARM64 binaries</Message>
     </PreBuildEvent>
     <PostBuildEvent>
@@ -560,6 +560,10 @@
       <AdditionalManifestFiles>
       </AdditionalManifestFiles>
     </Manifest>
+    <PreBuildEvent>
+      <Command>if not exist "$(ProjectDir)external\$(Platform)" (echo ARM64 LHM-CppExport binaries are required under external\ARM64. Build ARM64 in LHM-CppExport when available and place CPPdll.lib and DLL files under external\ARM64. &amp; exit /b 1)&#x0D;&#x0A;if not exist "$(ProjectDir)external\$(Platform)\CPPdll.lib" (echo Missing CPPdll.lib. ARM64 LHM-CppExport binaries are required under external\ARM64. &amp; exit /b 1)&#x0D;&#x0A;dir /b "$(ProjectDir)external\$(Platform)\*.dll" &gt;nul 2&gt;nul || (echo Missing LibreHardwareMonitor DLL files. ARM64 LHM-CppExport binaries are required under external\ARM64. &amp; exit /b 1)</Command>
+      <Message>Verify LibreHardwareMonitor ARM64 binaries</Message>
+    </PreBuildEvent>
     <PostBuildEvent>
       <Command>xcopy /y /d "$(ProjectDir)external\$(Platform)\*.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
