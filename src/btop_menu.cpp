@@ -106,6 +106,7 @@ namespace Menu {
 	const array<int, 3> menu_width = {19, 12, 12};
 
 	const vector<array<string, 2>> help_text = {
+		{"Architecture", Shared::arch_info()},
 		{"Mouse 1", "Clicks buttons and selects in process list."},
 		{"Mouse scroll", "Scrolls any scrollable list/text under cursor."},
 		{"Esc, m", "Toggles main menu."},

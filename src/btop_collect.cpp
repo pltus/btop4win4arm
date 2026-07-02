@@ -952,6 +952,45 @@ namespace Shared {
 		sleep_ms(100);
 	}
 
+	string process_arch() {
+	#if defined(_M_ARM64) || defined(__aarch64__)
+		return "ARM64";
+	#elif defined(_M_X64) || defined(__x86_64__) || defined(_M_AMD64)
+		return "x64";
+	#elif defined(_M_IX86) || defined(__i386__)
+		return "x86";
+	#elif defined(_M_ARM) || defined(__arm__)
+		return "ARM";
+	#else
+		return "unknown";
+	#endif
+	}
+
+	string native_arch() {
+		SYSTEM_INFO nativeSysInfo;
+		GetNativeSystemInfo(&nativeSysInfo);
+
+		switch (nativeSysInfo.wProcessorArchitecture) {
+			case PROCESSOR_ARCHITECTURE_ARM64:
+				return "ARM64";
+			case PROCESSOR_ARCHITECTURE_AMD64:
+				return "AMD64";
+			case PROCESSOR_ARCHITECTURE_INTEL:
+				return "x86";
+			case PROCESSOR_ARCHITECTURE_ARM:
+				return "ARM";
+			case PROCESSOR_ARCHITECTURE_IA64:
+				return "IA64";
+			case PROCESSOR_ARCHITECTURE_UNKNOWN:
+			default:
+				return "unknown";
+		}
+	}
+
+	string arch_info() {
+		return "process architecture: " + process_arch() + ", native system architecture: " + native_arch();
+	}
+
 	void init() {
 
 		//? Shared global variables init
@@ -969,6 +1008,7 @@ namespace Shared {
 		}
 
 		init_status("Getting system info");
+		Logger::info("Shared::init() -> " + arch_info());
 		SYSTEM_INFO sysinfo;
 		GetSystemInfo(&sysinfo);
 

@@ -71,6 +71,9 @@ namespace Tools {
 namespace Shared {
 	//* Initialize platform specific needed variables and check for errors
 	void init();
+	string process_arch();
+	string native_arch();
+	string arch_info();
 
 	extern long coreCount, page_size, clk_tck;
 }
