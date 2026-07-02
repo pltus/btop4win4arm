@@ -221,15 +221,13 @@ Also needs a UTF8 locale and a font that covers:
 
 1. (Optional) For compiling with LibreHardwareMonitor support:
 
-    * Either download latest release from https://github.com/aristocratos/LHM-CppExport and place the files in the matching architecture folder under "external" in the btop4win top folder, or:
+    * Either download latest release from https://github.com/aristocratos/LHM-CppExport and place the "external" folder in btop4win top folder, or:
 
     * 1. Clone https://github.com/aristocratos/LHM-CppExport and open the solution
 
-    * 2. Build the Release configuration for CPPdll that matches your target architecture.
+    * 2. Build Release x64 configuration for CPPdll
 
-    * 3. Copy all .dll and .lib files from "x64/Release" to "external/x64" for x64 builds. If LHM-CppExport adds a native ARM64 configuration, build "Release ARM64" and copy its .dll and .lib files to "external/ARM64".
-
-    * 4. The upstream LHM-CppExport solution currently provides x86/x64 configurations, but not ARM64. Use the regular "Release|ARM64" btop4win configuration when native ARM64 LHM-CppExport binaries are unavailable; "Release-LHM|ARM64" fails early unless "external/ARM64" has been populated.
+    * 3. Copy all .dll and .lib files from "x64/Release" to "external" folder in top-level of btop4win
 
 2. btop4win
 
@@ -239,7 +237,7 @@ Also needs a UTF8 locale and a font that covers:
 
     * 3. Choose between Debug, Release and Release-LHM configurations.
 
-    * * (Release-LHM sets admin requirement on the binary, LHM_Enabled declaration and needs LHM-CppExport dll's and .lib in the matching "external/<platform>" folder).
+    * * (Release-LHM sets admin requirement on the binary, LHM_Enabled declaration and needs LHM-CppExport dll's and .lib in "external" folder).
 
     * 4. Build solution.
 
