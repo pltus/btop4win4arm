@@ -520,74 +520,94 @@ namespace Cpu {
 		}
 
 		//? Get Cpu TjMax temperature value
-		try {
-			auto lines = ssplit(output.substr(output.find("Parameters")), '\n');
-			bool hit = false;
-			for (auto& instr : lines) {
-				if (instr.contains("CPU Core") or instr.contains("CPU Package")) {
-					hit = true;
+		const auto parameters_pos = output.find("Parameters");
+		if (parameters_pos != string::npos) {
+			try {
+				auto lines = ssplit(output.substr(parameters_pos), '\n');
+				bool hit = false;
+				for (auto& instr : lines) {
+					if (instr.contains("CPU Core") or instr.contains("CPU Package")) {
+						hit = true;
+					}
+					else if (instr.contains("TjMax") and hit) {
+						current_cpu.temp_max = std::stoi(instr.substr(instr.find_last_of(':') + 1));
+						break;
+					}
+					else if (not instr.contains("+"))
+						hit = false;
+					else if (instr.starts_with("-----"))
+						break;
 				}
-				else if (instr.contains("TjMax") and hit) {
-					current_cpu.temp_max = std::stoi(instr.substr(instr.find_last_of(':') + 1));
-					break;
-				}
-				else if (not instr.contains("+"))
-					hit = false;
-				else if (instr.starts_with("-----"))
-					break;
+			}
+			catch (const std::exception& e) {
+				Logger::debug("Error getting CPU TjMax value from Open Hardware Monitor Report: "s + e.what());
 			}
 		}
-		catch (const std::exception& e) {
-			Logger::debug("Error getting CPU TjMax value from Open Hardware Monitor Report: "s + e.what());
-		}
 
-		int found_sensors = OHMRrawStats.CPU.size() - 1;
+		const int found_sensors = OHMRrawStats.CPU.size() > 1 ? static_cast<int>(OHMRrawStats.CPU.size() - 1) : 0;
 
 		//? Get Cpu core mapping
 		unordered_flat_map<int, int> core_map;
-		try {
-			int cpuid = 0, coreid = 0, n = 0;
-			auto lines = ssplit(output.substr(output.find("CPUID")), '\n');
-			
-			for (auto& instr : lines) {
-				if (instr.starts_with(" CPU Thread:")) {
-					cpuid = std::stoi(instr.substr(instr.find(':') + 1));
-				}
-				else if (instr.starts_with(" Core ID:")) {
-					coreid = std::stoi(instr.substr(instr.find(':') + 1));;
-					if (coreid >= found_sensors) {
-						if (n >= found_sensors) n = 0;
-						core_map[cpuid] = n++;
+		string mapping_type;
+		const auto cpuid_pos = output.find("CPUID");
+		if (found_sensors <= 0) {
+			mapping_type = OHMRrawStats.CPU.empty() ? "no sensors" : "package-only fallback";
+		}
+		else if (cpuid_pos != string::npos) {
+			try {
+				int cpuid = 0, coreid = 0, n = 0;
+				auto lines = ssplit(output.substr(cpuid_pos), '\n');
+
+				for (auto& instr : lines) {
+					if (instr.starts_with(" CPU Thread:")) {
+						cpuid = std::stoi(instr.substr(instr.find(':') + 1));
 					}
-					else
-						core_map[cpuid] = coreid;
+					else if (instr.starts_with(" Core ID:")) {
+						coreid = std::stoi(instr.substr(instr.find(':') + 1));
+						if (coreid >= found_sensors) {
+							if (n >= found_sensors) n = 0;
+							core_map[cpuid] = n++;
+						}
+						else
+							core_map[cpuid] = coreid;
+					}
+					else if (instr.starts_with("-----"))
+						break;
 				}
-				else if (instr.starts_with("-----"))
-					break;
+				mapping_type = core_map.empty() ? "sequential fallback" : "CPUID mapping";
+			}
+			catch (const std::exception& e) {
+				Logger::debug("Error getting CPU core mapping from Open Hardware Monitor Report: "s + e.what());
+				core_map.clear();
+				mapping_type = "sequential fallback";
 			}
 		}
-		catch (const std::exception& e) {
-			Logger::debug("Error getting CPU core mapping from Open Hardware Monitor Report: "s + e.what());
-			core_map.clear();
+		else {
+			mapping_type = "sequential fallback";
 		}
 
-		//? If core mapping was incomplete try to guess remainder, if missing completely, map 0-0 1-1 2-2 etc.
-		if (cmp_less(core_map.size(), Shared::coreCount)) {
+		//? If CPUID core mapping was incomplete try to guess remainder.
+		if (mapping_type == "CPUID mapping" and cmp_less(core_map.size(), Shared::coreCount)) {
 			if (Shared::coreCount % 2 == 0 and (long)core_map.size() == Shared::coreCount / 2) {
 				for (int i = 0, n = 0; i < Shared::coreCount / 2; i++) {
-					if (n > found_sensors) n = 0;
+					if (n >= found_sensors) n = 0;
 					core_map[Shared::coreCount / 2 + i] = n++;
 				}
 			}
 			else {
-				core_map.clear();
-				for (int i = 0, n = 0; i < Shared::coreCount; i++) {
-					if (n >= found_sensors) n = 0;
-					core_map[i] = n++;
-				}
+				mapping_type = "sequential fallback";
 			}
 		}
 
+		//? ARM64-friendly fallback: map available per-core CPU temperature sensors sequentially.
+		if (mapping_type == "sequential fallback") {
+			core_map.clear();
+			for (int i = 0; i < Shared::coreCount and i < found_sensors; i++) {
+				core_map[i] = i;
+			}
+		}
+
+		Logger::debug("LHM CPU temperature mapping used "s + mapping_type + " (per-core sensors: " + std::to_string(found_sensors) + ", mapped cores: " + std::to_string(core_map.size()) + ")");
 		Cpu::core_mapping = core_map;
 
 		
