@@ -332,7 +332,7 @@
       </AdditionalManifestFiles>
     </Manifest>
     <PostBuildEvent>
-      <Command>xcopy /y /d  "$(ProjectDir)external\$(Platform)\*.dll" "$(OutDir)"</Command>
+      <Command>xcopy /y /d "$(ProjectDir)external\$(Platform)\*.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy LibreHardwareMonitor DLL's</Message>
@@ -365,7 +365,7 @@
       </AdditionalManifestFiles>
     </Manifest>
     <PostBuildEvent>
-      <Command>xcopy /y /d  "$(ProjectDir)external\$(Platform)\*.dll" "$(OutDir)"</Command>
+      <Command>xcopy /y /d "$(ProjectDir)external\$(Platform)\*.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy LibreHardwareMonitor DLL's</Message>
@@ -434,7 +434,7 @@
       </AdditionalManifestFiles>
     </Manifest>
     <PostBuildEvent>
-      <Command>xcopy /y /d  "$(ProjectDir)external\$(Platform)\*.dll" "$(OutDir)"</Command>
+      <Command>xcopy /y /d "$(ProjectDir)external\$(Platform)\*.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy LibreHardwareMonitor DLL's</Message>
@@ -461,7 +461,7 @@
       </AdditionalManifestFiles>
     </Manifest>
     <PostBuildEvent>
-      <Command>xcopy /y /d  "$(ProjectDir)external\$(Platform)\*.dll" "$(OutDir)"</Command>
+      <Command>xcopy /y /d "$(ProjectDir)external\$(Platform)\*.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy LibreHardwareMonitor DLL's</Message>
@@ -529,8 +529,12 @@
       <AdditionalManifestFiles>
       </AdditionalManifestFiles>
     </Manifest>
+    <PreBuildEvent>
+      <Command>if not exist "$(ProjectDir)external\$(Platform)" (echo LHM-CppExport does not provide an ARM64 release in the upstream solution. Build Release ARM64 in LHM-CppExport when available and place DLL/LIB files under external\ARM64. &amp;&amp; exit /b 1)</Command>
+      <Message>Verify LibreHardwareMonitor ARM64 binaries</Message>
+    </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy /y /d  "$(ProjectDir)external\$(Platform)\*.dll" "$(OutDir)"</Command>
+      <Command>xcopy /y /d "$(ProjectDir)external\$(Platform)\*.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy LibreHardwareMonitor DLL's</Message>
@@ -557,7 +561,7 @@
       </AdditionalManifestFiles>
     </Manifest>
     <PostBuildEvent>
-      <Command>xcopy /y /d  "$(ProjectDir)external\$(Platform)\*.dll" "$(OutDir)"</Command>
+      <Command>xcopy /y /d "$(ProjectDir)external\$(Platform)\*.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy LibreHardwareMonitor DLL's</Message>
