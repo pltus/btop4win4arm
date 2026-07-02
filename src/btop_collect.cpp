@@ -64,7 +64,7 @@ tab-size = 4
 #include <btop_draw.hpp>
 
 #ifdef LHM_Enabled
-	#pragma comment(lib, "CPPdll.lib")
+	#pragma comment(lib, "external\\CPPdll.lib")
 	_declspec(dllexport) std::string FetchLHMValues();
 	_declspec(dllexport) std::string FetchLHMReport();
 #endif
