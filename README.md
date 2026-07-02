@@ -200,7 +200,7 @@ Also needs a UTF8 locale and a font that covers:
 
 1. Make sure you have the latest MSVC Runtime Libraries installed: https://aka.ms/vs/17/release/vc_redist.x64.exe
 
-2. Download package of choice from latest [release](https://github.com/aristocratos/btop4win/releases/latest)
+2. Download package of choice from latest [release](https://github.com/aristocratos/btop4win/releases/latest). ARM64 release artifacts are packaged separately, for example `btop4win-arm64.zip`.
 
 3. Extract the btop4win folder anywhere and run btop4win.exe.
 
@@ -225,9 +225,9 @@ Also needs a UTF8 locale and a font that covers:
 
     * 1. Clone https://github.com/aristocratos/LHM-CppExport and open the solution
 
-    * 2. Build Release x64 configuration for CPPdll
+    * 2. Build the CPPdll Release configuration for the target platform (`x64` or `ARM64`)
 
-    * 3. Copy all .dll and .lib files from "x64/Release" to "external" folder in top-level of btop4win
+    * 3. Copy all .dll and .lib files from the platform-specific output folder (for example `x64/Release` or `ARM64/Release`) to the matching `external/<Platform>` folder in top-level of btop4win
 
 2. btop4win
 
@@ -237,7 +237,7 @@ Also needs a UTF8 locale and a font that covers:
 
     * 3. Choose between Debug, Release and Release-LHM configurations.
 
-    * * (Release-LHM sets admin requirement on the binary, LHM_Enabled declaration and needs LHM-CppExport dll's and .lib in "external" folder).
+    * * (Release-LHM sets admin requirement on the binary, LHM_Enabled declaration and needs LHM-CppExport dll's and .lib in the platform-specific `external/<Platform>` folder). Release outputs are written under architecture-specific folders such as `x64/Release` and `ARM64/Release`; package ARM64 builds separately, for example as `btop4win-arm64.zip`.
 
     * 4. Build solution.
 
