@@ -974,7 +974,7 @@ namespace Shared {
 			case PROCESSOR_ARCHITECTURE_ARM64:
 				return "ARM64";
 			case PROCESSOR_ARCHITECTURE_AMD64:
-				return "AMD64";
+				return "x64";
 			case PROCESSOR_ARCHITECTURE_INTEL:
 				return "x86";
 			case PROCESSOR_ARCHITECTURE_ARM:
@@ -988,7 +988,7 @@ namespace Shared {
 	}
 
 	string arch_info() {
-		return "process architecture: " + process_arch() + ", native system architecture: " + native_arch();
+		return "Process: " + process_arch() + ", Native system: " + native_arch();
 	}
 
 	void init() {
